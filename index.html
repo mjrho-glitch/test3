@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>감사해U 🌱 밀알복지재단</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{font-family:'Noto Sans KR',sans-serif;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{margin:0;min-height:100vh;background:linear-gradient(160deg,#fdf6ff 0%,#f0fdf4 45%,#fef9f0 100%)}
+    .glass{background:rgba(255,255,255,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1.5px solid rgba(255,255,255,.9)}
+
+    /* 버튼 */
+    .btn-g{background:linear-gradient(135deg,#43c47a 0%,#2d7a4f 100%);color:#fff;border:none;cursor:pointer;transition:all .2s;font-family:inherit;box-shadow:0 4px 14px rgba(45,122,79,.28)}
+    .btn-g:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 22px rgba(45,122,79,.36)}
+    .btn-g:active:not(:disabled){transform:translateY(1px)}
+    .btn-g:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none}
+
+    /* 애니메이션 */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes popIn{from{opacity:0;transform:scale(.84)}to{opacity:1;transform:scale(1)}}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+    @keyframes wiggle{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes msgIn{0%{opacity:0;transform:translateY(10px)}20%,80%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-10px)}}
+    @keyframes sprout{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.18) translateY(-6px)}}
+    .fade{animation:fadeUp .38s ease both}
+    .pop{animation:popIn .32s cubic-bezier(.34,1.56,.64,1) both}
+    .bounce{animation:bounce 1.6s ease-in-out infinite}
+    .shake{animation:shake .4s ease}
+    .wiggle{animation:wiggle .6s ease}
+
+    /* 체크박스 커스텀 */
+    .chk-wrap input[type=checkbox]{display:none}
+    .chk-wrap label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:11px 14px;border-radius:16px;border:2px solid #f0e6ff;transition:all .18s;background:#fff}
+    .chk-wrap input:checked+label{border-color:#a78bfa;background:linear-gradient(135deg,#fdf4ff,#f0fdf4)}
+    .chk-box{width:22px;height:22px;min-width:22px;border-radius:7px;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;transition:all .2s;background:#fff;margin-top:1px}
+    .chk-wrap input:checked+label .chk-box{background:linear-gradient(135deg,#a78bfa,#5bc490);border-color:transparent}
+
+    /* 스크롤바 */
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#c4b5fd;border-radius:4px}
+
+    /* 핀 코드 입력 */
+    .pin-input{width:54px;height:62px;border-radius:16px;border:2.5px solid #e9d5ff;background:#fdf8ff;font-size:26px;text-align:center;outline:none;transition:all .2s;font-family:inherit;color:#7c3aed}
+    .pin-input:focus{border-color:#a78bfa;background:#fff;box-shadow:0 0 0 4px rgba(167,139,250,.15)}
+
+    /* 하단 고정 */
+    .fixed-footer{position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:10px;font-size:11px;color:#a78bfa;background:rgba(255,255,255,.7);backdrop-filter:blur(10px);z-index:50;letter-spacing:.3px}
+
+    /* 스태프 버튼 */
+    .staff-btn{padding:11px 16px;border-radius:14px;border:2px solid #f0e6ff;background:#fff;font-size:13.5px;cursor:pointer;text-align:left;font-weight:500;transition:all .18s;font-family:inherit;color:#374151;display:flex;align-items:center;gap:10px}
+    .staff-btn:hover{background:linear-gradient(135deg,#fdf4ff,#f0fdf4);border-color:#c4b5fd;transform:translateX(3px)}
+    .staff-btn:disabled{opacity:.5;cursor:not-allowed}
+  </style>
+</head>
+<body>
+<canvas id="confetti-cvs" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999"></canvas>
+<div id="root"></div>
+
+<script type="text/babel">
+// ================================================================
+// ⚙️  배포 전 반드시 수정하세요!
+// ================================================================
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxy4ks_0bw6n_A8s6vgQXX70eiAIuQ9cy8h_tIkJCNNVEWpr2Xd4T9G-qWikgMtwt-wiA/exec";
+const STAFF = [
+  "인재경영실-노민정-간사",
+  "인재경영실-김진일-간사",
+  "경영지원본부-정성찬-본부장",
+  "인재경영실-이현진-실장",
+  "인재경영실-문정은-팀장",
+  "인재경영실-손경빈-간사",
+  "인재경영실-김지은-간사",
+  "인재경영실-나경미-과장",
+  "인재경영실-조은애-팀장",
+];
+// ================================================================
+
+const MAX_SEND = 3;
+const BASE_T   = 36.5;
+const TMPLS = [
+  "바쁠 때 먼저 손 내밀고 도와주셔서 감사해요.",
+  "밝은 인사와 긍정적인 에너지로 힘이 되어주셔서 감사해요.",
+  "기꺼이 고민을 들어주고 든든한 의지가 되어주셔서 감사해요.",
+  "늘 친절하고 따뜻한 태도로 배려해 주셔서 감사해요.",
+  "작은 부분까지 놓치지 않고 세심하게 챙겨주셔서 감사해요.",
+  "묵묵히 제 몫을 다하며 든든하게 자리를 지켜주셔서 감사해요.",
+  "언제나 변함없이 함께해 주셔서 큰 위로와 힘이 돼요.",
+];
+
+const {useState,useEffect,useRef} = React;
+
+const LOADING_MSGS = [
+  "🌱 마음의 온도를 재는 중입니다...",
+  "💌 따뜻한 쪽지함을 열어보고 있어요...",
+  "👀 동료들의 감사를 싹 모아오는 중!",
+  "✨ 오늘은 무슨 감사를 보내볼까요?",
+];
+
+/* ── LOADING OVERLAY ──────────────────────────────────────────── */
+function LoadingOverlay(){
+  const [idx,setIdx]=useState(()=>Math.floor(Math.random()*LOADING_MSGS.length));
+  const [msgKey,setMsgKey]=useState(0);
+
+  useEffect(()=>{
+    const t=setInterval(()=>{
+      setIdx(p=>(p+1)%LOADING_MSGS.length);
+      setMsgKey(p=>p+1);
+    },1800);
+    return()=>clearInterval(t);
+  },[]);
+
+  return(
+    <div style={{position:'fixed',inset:0,background:'rgba(245,240,255,.88)',backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',zIndex:800,gap:24}}>
+      {/* 스피너 + 새싹 */}
+      <div style={{position:'relative',width:82,height:82,display:'flex',alignItems:'center',justifyContent:'center'}}>
+        {/* 바깥 링 */}
+        <div style={{position:'absolute',inset:0,borderRadius:'50%',border:'4px solid #e9d5ff',borderTopColor:'#a78bfa',animation:'spin 1s linear infinite'}}/>
+        {/* 안쪽 링 */}
+        <div style={{position:'absolute',inset:10,borderRadius:'50%',border:'3px solid #f0fdf4',borderTopColor:'#5bc490',animation:'spin 1.6s linear infinite reverse'}}/>
+        {/* 새싹 이모지 */}
+        <span style={{fontSize:30,animation:'sprout 1.2s ease-in-out infinite',zIndex:1,userSelect:'none'}}>🌱</span>
+      </div>
+
+      {/* 메시지 */}
+      <div style={{minHeight:32,display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <p key={msgKey} style={{
+          margin:0,
+          fontSize:15,
+          fontWeight:700,
+          color:'#7c3aed',
+          textAlign:'center',
+          animation:'msgIn 1.8s ease both',
+          letterSpacing:-.2,
+          lineHeight:1.5,
+          padding:'0 32px',
+        }}>
+          {LOADING_MSGS[idx]}
+        </p>
+      </div>
+
+      {/* 하단 점 인디케이터 */}
+      <div style={{display:'flex',gap:6}}>
+        {LOADING_MSGS.map((_,i)=>(
+          <div key={i} style={{width:i===idx%LOADING_MSGS.length?18:6,height:6,borderRadius:3,background:i===idx%LOADING_MSGS.length?'linear-gradient(90deg,#a78bfa,#5bc490)':'#e9d5ff',transition:'all .4s ease'}}/>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── CONFETTI ─────────────────────────────────────────────────── */
+function launchConfetti(){
+  const cvs=document.getElementById('confetti-cvs');
+  const ctx=cvs.getContext('2d');
+  cvs.width=window.innerWidth; cvs.height=window.innerHeight;
+  const cols=['#a78bfa','#5bc490','#f9a8d4','#fbbf24','#60a5fa','#fb923c','#f0abfc','#fff'];
+  const pts=Array.from({length:200},()=>({
+    x:Math.random()*cvs.width, y:cvs.height*(Math.random()*-.6)-10,
+    w:Math.random()*12+4, h:Math.random()*8+3,
+    c:cols[Math.floor(Math.random()*cols.length)],
+    vx:(Math.random()-.5)*6, vy:Math.random()*4+1.5,
+    rot:Math.random()*360, vr:(Math.random()-.5)*14, op:1,
+    shape:Math.random()>.5?'rect':'circle'
+  }));
+  let st=Date.now(),raf;
+  (function draw(){
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    const el=Date.now()-st;
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy+=.05; p.rot+=p.vr;
+      p.op=el>2000?Math.max(0,1-(el-2000)/1200):1;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.globalAlpha=p.op;ctx.fillStyle=p.c;
+      if(p.shape==='circle'){ctx.beginPath();ctx.arc(0,0,p.w/2,0,Math.PI*2);ctx.fill();}
+      else ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    if(el<3800){raf=requestAnimationFrame(draw);}else ctx.clearRect(0,0,cvs.width,cvs.height);
+  })();
+}
+
+/* ── 이름 파서: "인재경영실-노민정-간사" → {dept, name, title} ─── */
+function parseName(full){
+  const p=full.split('-');
+  return p.length>=3?{dept:p[0],name:p[1],title:p[2],full}:{dept:'',name:full,title:'',full};
+}
+
+/* ── THERMOMETER ──────────────────────────────────────────────── */
+function Thermometer({temp}){
+  const mn=36.5,mx=120,TH=130;
+  const pct=Math.min(1,Math.max(0,(temp-mn)/(mx-mn)));
+  const filled=TH*pct;
+  const col=temp<60?'#5bc490':temp<80?'#fbbf24':'#ef4444';
+  return(
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+      <svg width="52" height="200" viewBox="0 0 52 200">
+        <defs>
+          <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={temp<60?'#a7f3d0':temp<80?'#fde68a':'#fca5a5'}/>
+            <stop offset="100%" stopColor={col}/>
+          </linearGradient>
+        </defs>
+        <rect x="19" y="14" width="14" height={TH+12} rx="7" fill="rgba(0,0,0,.06)"/>
+        <rect x="21" y="16" width="10" height={TH} rx="5" fill="#f3e8ff"/>
+        <rect x="21" y={16+(TH-filled)} width="10" height={Math.max(0,filled)} rx="5" fill="url(#fillGrad)" style={{transition:'all 1s ease'}}/>
+        <circle cx="26" cy={TH+28} r="15" fill={col} opacity=".25" style={{transition:'fill 1s'}}/>
+        <circle cx="26" cy={TH+28} r="11" fill={col} style={{transition:'fill 1s'}}/>
+        {[{t:36.5,l:'36.5'},{t:70,l:'70'},{t:100,l:'100'}].map(m=>{
+          const y=16+TH-(TH*(m.t-mn)/(mx-mn));
+          return <g key={m.t}>
+            <line x1="32" y1={y} x2="38" y2={y} stroke="#c4b5fd" strokeWidth="1.5"/>
+            <text x="40" y={y+4} fontSize="6.5" fill="#a78bfa">{m.l}</text>
+          </g>;
+        })}
+      </svg>
+      <div style={{textAlign:'center'}}>
+        <div style={{fontSize:28,fontWeight:800,color:col,lineHeight:1,transition:'color 1s'}}>{temp.toFixed(1)}°</div>
+        <div style={{fontSize:11,color:'#c4b5fd',marginTop:2,fontWeight:600}}>나의 온도 🌡️</div>
+      </div>
+    </div>
+  );
+}
+
+/* ── PIN 입력 ─────────────────────────────────────────────────── */
+function PinInput({value,onChange,onEnter}){
+  const refs=[useRef(),useRef(),useRef(),useRef()];
+  const digits=value.split('').concat(['','','','']).slice(0,4);
+  const handleKey=(i,e)=>{
+    if(e.key==='Backspace'){
+      const nd=digits.slice();nd[i]='';
+      onChange(nd.join(''));
+      if(i>0)refs[i-1].current.focus();
+    } else if(/^[0-9]$/.test(e.key)){
+      const nd=digits.slice();nd[i]=e.key;
+      onChange(nd.join('').replace(/\s/g,''));
+      if(i<3)refs[i+1].current.focus();
+      else if(nd.every(d=>d!=='')onEnter&&onEnter(nd.join(''));
+    }
+  };
+  return(
+    <div style={{display:'flex',gap:10,justifyContent:'center',margin:'16px 0'}}>
+      {digits.map((d,i)=>(
+        <input key={i} ref={refs[i]} className="pin-input" type="password" inputMode="numeric"
+          value={d} readOnly
+          onKeyDown={e=>handleKey(i,e)}
+          onClick={()=>refs[i].current.focus()}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ── LOGIN SCREEN ─────────────────────────────────────────────── */
+function LoginScreen({onSelect,loading}){
+  const [q,setQ]=useState('');
+  const list=(q?STAFF.filter(n=>n.includes(q)):STAFF);
+  const avatarColors=['#fde68a','#a7f3d0','#bfdbfe','#fecaca','#ddd6fe','#fed7aa','#fbcfe8','#d1fae5','#e9d5ff'];
+  return(
+    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',padding:'36px 18px 90px'}}>
+      {/* 헤더 */}
+      <div className="fade" style={{textAlign:'center',marginBottom:24}}>
+        <div className="bounce" style={{fontSize:58,lineHeight:1,marginBottom:6}}>🌱</div>
+        <h1 style={{margin:0,fontSize:32,fontWeight:800,background:'linear-gradient(135deg,#2d7a4f,#a78bfa)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',letterSpacing:-.5}}>감사해U</h1>
+        <p style={{margin:'5px 0 0',color:'#a78bfa',fontSize:12,fontWeight:600,letterSpacing:.5}}>밀알복지재단 교육문화팀 💜</p>
+      </div>
+
+      <div className="glass fade" style={{borderRadius:26,padding:'24px 20px',width:'100%',maxWidth:400,boxShadow:'0 8px 40px rgba(167,139,250,.18)'}}>
+        <h2 style={{margin:'0 0 4px',fontSize:18,fontWeight:700,color:'#374151',textAlign:'center'}}>
+          👋 안녕하세요! 누구세요?
+        </h2>
+        <p style={{margin:'0 0 16px',fontSize:13,color:'#9ca3af',textAlign:'center'}}>이름을 검색하거나 선택해 주세요</p>
+        <div style={{position:'relative',marginBottom:12}}>
+          <span style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',fontSize:16}}>🔍</span>
+          <input type="text" value={q} onChange={e=>setQ(e.target.value)} placeholder="이름 검색..."
+            style={{width:'100%',padding:'12px 14px 12px 40px',borderRadius:14,border:'2px solid #e9d5ff',fontSize:14,outline:'none',background:'#fdf8ff',transition:'border .2s',fontFamily:'inherit'}}
+            onFocus={e=>e.target.style.borderColor='#a78bfa'}
+            onBlur={e=>e.target.style.borderColor='#e9d5ff'}
+          />
+        </div>
+        <div style={{maxHeight:360,overflowY:'auto',display:'flex',flexDirection:'column',gap:6}}>
+          {list.map((n,idx)=>{
+            const p=parseName(n);
+            return(
+              <button key={n} className="staff-btn" disabled={loading} onClick={()=>onSelect(n)}>
+                <div style={{width:36,height:36,borderRadius:'50%',background:avatarColors[idx%avatarColors.length],display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:14,flexShrink:0,color:'#374151'}}>
+                  {p.name.charAt(0)}
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,color:'#1f2937',fontSize:14}}>{p.name}</div>
+                  <div style={{fontSize:11,color:'#9ca3af',marginTop:1}}>{p.dept} · {p.title}</div>
+                </div>
+                <span style={{fontSize:16,opacity:.4}}>→</span>
+              </button>
+            );
+          })}
+          {list.length===0&&<div style={{textAlign:'center',padding:'24px 0',color:'#c4b5fd',fontSize:13}}>검색 결과가 없어요 🥲</div>}
+        </div>
+
+      </div>
+      <div className="fixed-footer">Supported by 밀알디아코니아연구소</div>
+    </div>
+  );
+}
+
+/* ── INDIVIDUAL PW MODAL ──────────────────────────────────────── */
+function IndividualPwModal({name,mode,onSuccess,onCancel}){
+  const parsed=parseName(name);
+  const [pin,setPin]=useState('');
+  const [pin2,setPin2]=useState('');
+  const [err,setErr]=useState('');
+  const [shk,setShk]=useState(false);
+  const [loading,setLoading]=useState(false);
+  const isSet=mode==='set';
+
+  const shake=()=>{setShk(true);setTimeout(()=>setShk(false),450);};
+
+  const submit=async(p)=>{
+    const code=p||pin;
+    if(code.length!==4){setErr('4자리를 모두 입력해주세요!');shake();return;}
+    if(isSet&&pin2&&code!==pin2){setErr('비밀번호가 일치하지 않아요 🥺');shake();return;}
+    setLoading(true);setErr('');
+    try{
+      const body=isSet
+        ?{action:'setPassword',name,password:code}
+        :{action:'verifyPassword',name,password:code};
+      const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
+      const d=await r.json();
+      if(!d.success)throw new Error(d.error||'비밀번호가 틀렸어요 🥺');
+      onSuccess();
+    }catch(e){setErr(e.message);setPin('');setPin2('');shake();}
+    finally{setLoading(false);}
+  };
+
+  return(
+    <div style={{position:'fixed',inset:0,background:'rgba(109,40,217,.25)',backdropFilter:'blur(6px)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:400,padding:20}}>
+      <div className="glass pop" style={{borderRadius:28,padding:'36px 28px',width:'100%',maxWidth:340,boxShadow:'0 16px 56px rgba(109,40,217,.22)',textAlign:'center'}}>
+        <div className="wiggle" style={{fontSize:52,marginBottom:8}}>{isSet?'🔐':'🔑'}</div>
+        <h3 style={{margin:'0 0 6px',fontSize:21,fontWeight:800,background:'linear-gradient(135deg,#7c3aed,#2d7a4f)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+          {isSet?'비밀번호 설정':'반가워요!'}
+        </h3>
+        <p style={{margin:'0 0 4px',color:'#374151',fontSize:14,lineHeight:1.7}}>
+          {isSet
+            ? <><span style={{fontWeight:700,color:'#7c3aed'}}>{parsed.name}</span>님,<br/>첫 방문을 환영해요 🎉<br/><span style={{fontSize:13,color:'#9ca3af'}}>사용할 비밀번호 4자리를 설정해주세요</span></>
+            : <><span style={{fontWeight:700,color:'#7c3aed'}}>{parsed.name}</span>님<br/><span style={{fontSize:13,color:'#9ca3af'}}>{parsed.dept} · {parsed.title}</span></>
+          }
+        </p>
+        <div className={shk?'shake':''}>
+          <div style={{marginBottom: isSet?4:0}}>
+            <p style={{margin:'14px 0 2px',fontSize:12,color:'#a78bfa',fontWeight:600}}>{isSet?'새 비밀번호':'비밀번호'}</p>
+            <PinInput value={pin} onChange={v=>{setPin(v);setErr('');}} onEnter={isSet?undefined:submit}/>
+          </div>
+          {isSet&&(
+            <div>
+              <p style={{margin:'8px 0 2px',fontSize:12,color:'#a78bfa',fontWeight:600}}>비밀번호 확인</p>
+              <PinInput value={pin2} onChange={v=>{setPin2(v);setErr('');}} onEnter={()=>submit(pin)}/>
+            </div>
+          )}
+          {err&&<p style={{color:'#ef4444',fontSize:13,margin:'4px 0 8px',fontWeight:600}}>{err}</p>}
+        </div>
+        <button className="btn-g" onClick={()=>submit(pin)} disabled={loading||pin.length<4||(isSet&&pin2.length<4)}
+          style={{width:'100%',padding:15,borderRadius:15,fontSize:15,fontWeight:700,marginTop:8}}>
+          {loading?'확인 중... 🌱':isSet?'설정 완료 ✨':'로그인 💚'}
+        </button>
+        <button onClick={onCancel} style={{width:'100%',marginTop:10,background:'none',border:'none',color:'#c4b5fd',fontSize:13,cursor:'pointer',padding:8,fontFamily:'inherit'}}>
+          ← 다른 이름 선택
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── INBOX MODAL ──────────────────────────────────────────────── */
+function InboxModal({inbox,onClose}){
+  return(
+    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.45)',display:'flex',alignItems:'flex-end',zIndex:300}} onClick={onClose}>
+      <div className="glass pop" style={{width:'100%',maxWidth:480,margin:'0 auto',maxHeight:'82vh',borderRadius:'26px 26px 0 0',padding:'22px 18px 55px',overflowY:'auto',boxShadow:'0 -10px 50px rgba(109,40,217,.2)'}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:40,height:4,background:'#e9d5ff',borderRadius:4,margin:'0 auto 20px'}}/>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800,background:'linear-gradient(135deg,#7c3aed,#2d7a4f)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>💌 받은 쪽지함</h3>
+          <button onClick={onClose} style={{background:'#f3e8ff',border:'none',borderRadius:'50%',width:32,height:32,cursor:'pointer',fontSize:16,display:'flex',alignItems:'center',justifyContent:'center',color:'#7c3aed',fontWeight:700}}>✕</button>
+        </div>
+        {inbox.length===0?(
+          <div style={{textAlign:'center',padding:'44px 20px',color:'#c4b5fd'}}>
+            <div style={{fontSize:52,marginBottom:10}}>📭</div>
+            <p style={{fontSize:14,lineHeight:1.8}}>아직 쪽지가 없어요.<br/>첫 번째 감사 쪽지를 기다리는 중! 💜</p>
+          </div>
+        ):(
+          <div style={{display:'flex',flexDirection:'column',gap:12}}>
+            {inbox.map((n,i)=>(
+              <div key={i} style={{background:'linear-gradient(135deg,#fdf8ff,#f0fdf4)',borderRadius:18,padding:'14px 16px',border:'1.5px solid #e9d5ff',boxShadow:'0 2px 10px rgba(167,139,250,.1)'}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:8,alignItems:'center'}}>
+                  <span style={{fontWeight:800,color:'#7c3aed',fontSize:14}}>💜 {parseName(n.from).name}</span>
+                  <span style={{fontSize:11,color:'#c4b5fd',background:'#f3e8ff',padding:'2px 8px',borderRadius:8}}>{n.date}</span>
+                </div>
+                {n.templates&&n.templates.split(',').filter(t=>t.trim()).map((t,j)=>(
+                  <div key={j} style={{fontSize:12,color:'#374151',background:'rgba(255,255,255,.8)',borderRadius:9,padding:'5px 10px',marginBottom:4,border:'1px solid #ede9fe'}}>✨ {t.trim()}</div>
+                ))}
+                {n.message&&<p style={{margin:'8px 0 0',fontSize:13,color:'#4b5563',fontStyle:'italic',borderTop:'1px dashed #e9d5ff',paddingTop:8}}>💬 "{n.message}"</p>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── WRITE SCREEN ─────────────────────────────────────────────── */
+function WriteScreen({user,onSend,onBack,loading}){
+  const [recv,setRecv]=useState('');
+  const [srch,setSrch]=useState('');
+  const [sels,setSels]=useState([]);
+  const [msg,setMsg]=useState('');
+  const others=(srch?STAFF.filter(n=>n!==user&&n.includes(srch)):STAFF.filter(n=>n!==user));
+  const toggle=t=>setSels(p=>p.includes(t)?p.filter(x=>x!==t):[...p,t]);
+  const canSend=recv&&(sels.length>0||msg.trim());
+  const avatarColors=['#fde68a','#a7f3d0','#bfdbfe','#fecaca','#ddd6fe','#fed7aa','#fbcfe8','#d1fae5','#e9d5ff'];
+  const recvIdx=STAFF.indexOf(recv);
+  const recvP=recv?parseName(recv):null;
+  return(
+    <div style={{minHeight:'100vh',padding:'18px 16px 100px'}}>
+      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:18,maxWidth:480,margin:'0 auto 18px'}}>
+        <button onClick={onBack} style={{background:'rgba(255,255,255,.9)',border:'2px solid #e9d5ff',borderRadius:14,padding:'9px 16px',cursor:'pointer',fontSize:18,lineHeight:1,color:'#7c3aed',fontWeight:700}}>←</button>
+        <h2 style={{margin:0,fontSize:20,fontWeight:800,background:'linear-gradient(135deg,#7c3aed,#2d7a4f)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>💌 감사 쪽지 쓰기</h2>
+      </div>
+      <div className="glass fade" style={{borderRadius:24,padding:20,maxWidth:480,margin:'0 auto',boxShadow:'0 4px 28px rgba(167,139,250,.16)'}}>
+        {/* 받는 분 */}
+        <div style={{marginBottom:18}}>
+          <label style={{fontSize:13,fontWeight:700,color:'#7c3aed',display:'block',marginBottom:8}}>📮 누구에게 보낼까요?</label>
+          {!recv?(
+            <>
+              <div style={{position:'relative',marginBottom:8}}>
+                <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',fontSize:14}}>🔍</span>
+                <input type="text" value={srch} onChange={e=>setSrch(e.target.value)} placeholder="이름 검색..."
+                  style={{width:'100%',padding:'10px 14px 10px 36px',borderRadius:13,border:'2px solid #e9d5ff',fontSize:14,outline:'none',background:'#fdf8ff',transition:'border .2s',fontFamily:'inherit'}}
+                  onFocus={e=>e.target.style.borderColor='#a78bfa'} onBlur={e=>e.target.style.borderColor='#e9d5ff'}/>
+              </div>
+              <div style={{maxHeight:220,overflowY:'auto',display:'flex',flexDirection:'column',gap:5}}>
+                {others.map((n,idx)=>{
+                  const p=parseName(n);
+                  return(
+                    <button key={n} className="staff-btn" onClick={()=>setRecv(n)}>
+                      <div style={{width:34,height:34,borderRadius:'50%',background:avatarColors[STAFF.indexOf(n)%avatarColors.length],display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:13,flexShrink:0}}>
+                        {p.name.charAt(0)}
+                      </div>
+                      <div style={{flex:1}}>
+                        <div style={{fontWeight:700,fontSize:13}}>{p.name}</div>
+                        <div style={{fontSize:11,color:'#9ca3af'}}>{p.dept} · {p.title}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+                {others.length===0&&srch&&<div style={{textAlign:'center',color:'#c4b5fd',fontSize:13,padding:12}}>검색 결과가 없어요 🥲</div>}
+              </div>
+            </>
+          ):(
+            <div style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',background:'linear-gradient(135deg,#fdf4ff,#f0fdf4)',borderRadius:16,border:'2px solid #a78bfa'}}>
+              <div style={{width:38,height:38,borderRadius:'50%',background:avatarColors[recvIdx%avatarColors.length],display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:15,flexShrink:0}}>
+                {recvP.name.charAt(0)}
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontWeight:800,color:'#7c3aed',fontSize:14}}>{recvP.name}</div>
+                <div style={{fontSize:11,color:'#a78bfa'}}>{recvP.dept} · {recvP.title}</div>
+              </div>
+              <button onClick={()=>setRecv('')} style={{background:'#f3e8ff',border:'none',borderRadius:'50%',width:28,height:28,cursor:'pointer',fontSize:14,color:'#7c3aed',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700}}>✕</button>
+            </div>
+          )}
+        </div>
+        {recv&&<>
+          <div style={{marginBottom:16}}>
+            <label style={{fontSize:13,fontWeight:700,color:'#7c3aed',display:'block',marginBottom:10}}>
+              ✨ 감사 메시지 <span style={{color:'#c4b5fd',fontWeight:400,fontSize:12}}>(여러 개 선택 가능!)</span>
+            </label>
+            <div style={{display:'flex',flexDirection:'column',gap:6}}>
+              {TMPLS.map((t,i)=>(
+                <div key={i} className="chk-wrap">
+                  <input type="checkbox" id={`t${i}`} checked={sels.includes(t)} onChange={()=>toggle(t)}/>
+                  <label htmlFor={`t${i}`}>
+                    <div className="chk-box">{sels.includes(t)&&<span style={{color:'#fff',fontSize:12,fontWeight:800}}>✓</span>}</div>
+                    <span style={{fontSize:13,color:'#374151',lineHeight:1.55}}>{t}</span>
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{marginBottom:20}}>
+            <label style={{fontSize:13,fontWeight:700,color:'#7c3aed',display:'block',marginBottom:8}}>
+              ✍️ 직접 쓰기 <span style={{color:'#c4b5fd',fontWeight:400,fontSize:12}}>(선택)</span>
+            </label>
+            <textarea value={msg} onChange={e=>setMsg(e.target.value)} placeholder="마음을 담아 직접 전해봐요 💜" rows={3}
+              style={{width:'100%',padding:'12px 14px',borderRadius:14,border:'2px solid #e9d5ff',fontSize:14,outline:'none',resize:'none',lineHeight:1.65,transition:'border .2s',fontFamily:'inherit',background:'#fdf8ff'}}
+              onFocus={e=>e.target.style.borderColor='#a78bfa'} onBlur={e=>e.target.style.borderColor='#e9d5ff'}/>
+          </div>
+          <button className="btn-g" onClick={()=>onSend({recv,sels,msg})} disabled={!canSend||loading}
+            style={{width:'100%',padding:16,borderRadius:16,fontSize:16,fontWeight:700}}>
+            {loading?'보내는 중... 🌱':'💌 감사 쪽지 보내기'}
+          </button>
+        </>}
+      </div>
+      <div className="fixed-footer">Supported by 밀알디아코니아연구소</div>
+    </div>
+  );
+}
+
+/* ── MAIN SCREEN ──────────────────────────────────────────────── */
+function MainScreen({user,ud,onWrite,onInbox,onLogout}){
+  const {remainCount=0,temperature=BASE_T,inbox=[]}=ud||{};
+  const parsed=parseName(user);
+  const unread=inbox.length;
+  const reward=temperature>=100?{icon:'🌴',txt:'1시간 연차 달성!',col:'#dcfce7',border:'#5bc490'}
+              :temperature>=70 ?{icon:'☕',txt:'커피 쿠폰 달성!',col:'#fef9c3',border:'#fbbf24'}
+              :                  {icon:'🔥',txt:`다음 보상까지 ${(temperature<70?70:100-temperature).toFixed(1)}°C`,col:'#fdf4ff',border:'#e9d5ff'};
+  return(
+    <div style={{minHeight:'100vh',padding:'18px 16px 90px'}}>
+      <div style={{maxWidth:480,margin:'0 auto',display:'flex',flexDirection:'column',gap:13}}>
+
+        {/* 헤더 */}
+        <div className="glass fade" style={{borderRadius:26,padding:'22px 22px 18px',boxShadow:'0 6px 30px rgba(167,139,250,.18)',textAlign:'center'}}>
+          <div className="bounce" style={{fontSize:44,lineHeight:1,marginBottom:4}}>🌱</div>
+          <h1 style={{margin:0,fontSize:28,fontWeight:800,background:'linear-gradient(135deg,#2d7a4f,#a78bfa)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',letterSpacing:-.5}}>감사해U</h1>
+          <p style={{margin:'3px 0 14px',color:'#c4b5fd',fontSize:11,fontWeight:600,letterSpacing:.5}}>밀알복지재단 교육문화팀 💜</p>
+          <div style={{display:'inline-flex',alignItems:'center',gap:8,background:'linear-gradient(135deg,#fdf4ff,#f0fdf4)',padding:'8px 16px',borderRadius:20,border:'1.5px solid #e9d5ff'}}>
+            <div style={{width:30,height:30,borderRadius:'50%',background:'linear-gradient(135deg,#a78bfa,#5bc490)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:13}}>
+              {parsed.name.charAt(0)}
+            </div>
+            <span style={{fontWeight:700,color:'#374151',fontSize:13}}>{parsed.name} {parsed.title}</span>
+            <button onClick={onLogout} style={{background:'#f3e8ff',border:'none',borderRadius:8,padding:'3px 9px',fontSize:11,color:'#a78bfa',cursor:'pointer',fontFamily:'inherit',fontWeight:600}}>변경</button>
+          </div>
+        </div>
+
+        {/* 온도계 */}
+        <div className="glass fade" style={{borderRadius:24,padding:'20px 18px',boxShadow:'0 4px 24px rgba(167,139,250,.14)'}}>
+          <div style={{fontSize:13,fontWeight:700,color:'#7c3aed',marginBottom:14}}>🌡️ 나의 감사 온도</div>
+          <div style={{display:'flex',alignItems:'center',gap:16}}>
+            <Thermometer temp={temperature}/>
+            <div style={{flex:1,display:'flex',flexDirection:'column',gap:8}}>
+              {[{t:70,icon:'☕',label:'커피 쿠폰'},{t:100,icon:'🌴',label:'1시간 연차'}].map(r=>(
+                <div key={r.t} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 12px',background:temperature>=r.t?'#fef9c3':'#fdf8ff',borderRadius:13,border:`1.5px solid ${temperature>=r.t?'#fbbf24':'#e9d5ff'}`}}>
+                  <span style={{fontSize:20}}>{r.icon}</span>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:12,fontWeight:700,color:'#374151'}}>{r.t}°C</div>
+                    <div style={{fontSize:11,color:'#9ca3af'}}>{r.label}</div>
+                  </div>
+                  {temperature>=r.t&&<span style={{fontSize:11,fontWeight:800,color:'#d97706',background:'#fef3c7',padding:'2px 8px',borderRadius:8}}>달성! 🎉</span>}
+                </div>
+              ))}
+              <div style={{padding:'9px 12px',background:reward.col,borderRadius:13,fontSize:12,fontWeight:700,color:'#374151',textAlign:'center',border:`1.5px solid ${reward.border}`}}>
+                {reward.icon} {reward.txt}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 배너 */}
+        <div className="glass" style={{borderRadius:18,padding:'13px 18px',background:'linear-gradient(135deg,rgba(167,139,250,.12),rgba(91,196,144,.12))',border:'1.5px solid rgba(167,139,250,.3)',fontSize:13,color:'#374151',textAlign:'center',lineHeight:1.8}}>
+          ☕ 밀알디아코니아연구소에서 지급할 커피가 머지않았습니다!<br/>
+          <span style={{color:'#7c3aed',fontWeight:700}}>오늘도 감사의 온도를 높여봐요 🌡️✨</span>
+        </div>
+
+        {/* 버튼 */}
+        <div style={{display:'flex',gap:12}}>
+          <button className="btn-g" onClick={onWrite} disabled={remainCount===0}
+            style={{flex:1,padding:'18px 12px',borderRadius:20,fontSize:15,fontWeight:700,display:'flex',flexDirection:'column',alignItems:'center',gap:5,background:remainCount>0?'linear-gradient(135deg,#43c47a,#2d7a4f)':''}}>
+            <span style={{fontSize:28}}>💌</span>
+            <span>감사 쪽지 쓰기</span>
+            <span style={{fontSize:11,opacity:.85,fontWeight:500,background:'rgba(255,255,255,.25)',padding:'2px 10px',borderRadius:10}}>오늘 남은 기회: {remainCount}회</span>
+          </button>
+          <button onClick={onInbox}
+            style={{width:82,padding:'18px 10px',borderRadius:20,border:'2px solid #e9d5ff',background:'#fff',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:5,position:'relative',transition:'all .2s',flexShrink:0}}
+            onMouseEnter={e=>{e.currentTarget.style.background='#fdf4ff';e.currentTarget.style.borderColor='#a78bfa';}}
+            onMouseLeave={e=>{e.currentTarget.style.background='#fff';e.currentTarget.style.borderColor='#e9d5ff';}}>
+            <span style={{fontSize:28}}>📬</span>
+            <span style={{fontSize:12,fontWeight:700,color:'#7c3aed'}}>쪽지함</span>
+            {unread>0&&<span style={{position:'absolute',top:8,right:8,background:'linear-gradient(135deg,#f43f5e,#ef4444)',color:'#fff',borderRadius:'50%',width:20,height:20,fontSize:10,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 2px 8px rgba(239,68,68,.4)'}}>{unread>99?'99+':unread}</span>}
+          </button>
+        </div>
+      </div>
+      <div className="fixed-footer">Supported by 밀알디아코니아연구소</div>
+    </div>
+  );
+}
+
+/* ── SUCCESS MODAL ────────────────────────────────────────────── */
+function SuccessModal({recv,onClose}){
+  const parsed=parseName(recv);
+  useEffect(()=>{launchConfetti();},[]);
+  return(
+    <div style={{position:'fixed',inset:0,background:'rgba(109,40,217,.3)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:500,padding:20}}>
+      <div className="glass pop" style={{borderRadius:28,padding:'44px 30px',textAlign:'center',maxWidth:320,width:'100%',boxShadow:'0 20px 60px rgba(109,40,217,.28)'}}>
+        <div style={{fontSize:64,marginBottom:8}}>🎉</div>
+        <h3 style={{fontSize:24,fontWeight:800,margin:'0 0 10px',background:'linear-gradient(135deg,#7c3aed,#2d7a4f)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>전달 완료!</h3>
+        <p style={{color:'#374151',fontSize:15,margin:'0 0 6px',lineHeight:1.7}}>
+          <strong style={{color:'#7c3aed'}}>{parsed.name}</strong>님께<br/>따뜻한 감사가 전해졌어요 💜
+        </p>
+        <p style={{color:'#9ca3af',fontSize:13,margin:'0 0 26px'}}>두 분 모두 +1°C 따뜻해졌어요 🌡️</p>
+        <button className="btn-g" onClick={onClose} style={{width:'100%',padding:15,borderRadius:15,fontSize:15,fontWeight:700}}>확인 ✨</button>
+      </div>
+    </div>
+  );
+}
+
+/* ── APP ──────────────────────────────────────────────────────── */
+function App(){
+  const [screen,setScreen]=useState('login');
+  const [user,setUser]=useState(null);
+  const [ud,setUd]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [inbox,setInbox]=useState(false);
+  const [success,setSuccess]=useState(null);
+  const [errMsg,setErrMsg]=useState('');
+  const [pwModal,setPwModal]=useState(null); // null | {name, mode}
+
+  const fetchUd=async name=>{
+    setLoading(true);
+    try{
+      const r=await fetch(`${SHEET_URL}?action=getUser&name=${encodeURIComponent(name)}`);
+      const d=await r.json();
+      if(d.error)throw new Error(d.error);
+      setUd(d);
+    }catch(e){setErrMsg('서버 연결 실패. 잠시 후 다시 시도해 주세요.');}
+    finally{setLoading(false);}
+  };
+
+  const handleSelect=async name=>{
+    setLoading(true);
+    try{
+      const r=await fetch(`${SHEET_URL}?action=checkUser&name=${encodeURIComponent(name)}`);
+      const d=await r.json();
+      if(d.error)throw new Error(d.error);
+      setPwModal({name,mode:d.hasPassword?'check':'set'});
+    }catch(e){setErrMsg('서버 연결 실패. SHEET_URL을 확인해 주세요.');}
+    finally{setLoading(false);}
+  };
+
+  const handlePwSuccess=async()=>{
+    const name=pwModal.name;
+    setPwModal(null);
+    setUser(name);
+    await fetchUd(name);
+    setScreen('main');
+  };
+
+  const handleSend=async({recv,sels,msg})=>{
+    setLoading(true);
+    try{
+      const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({sender:user,receiver:recv,templates:sels,message:msg})});
+      const d=await r.json();
+      if(!d.success)throw new Error(d.error||'전송 실패');
+      setUd(p=>({...p,temperature:d.senderTemp,remainCount:d.remainCount}));
+      setSuccess(recv);
+      setScreen('main');
+    }catch(e){setErrMsg(e.message||'전송 중 오류가 발생했습니다.');}
+    finally{setLoading(false);}
+  };
+
+  return(
+    <div style={{maxWidth:480,margin:'0 auto'}}>
+      {errMsg&&(
+        <div style={{position:'fixed',top:16,left:'50%',transform:'translateX(-50%)',background:'#fff',border:'2px solid #fca5a5',color:'#dc2626',padding:'10px 18px',borderRadius:14,fontSize:13,zIndex:600,maxWidth:340,textAlign:'center',boxShadow:'0 4px 20px rgba(239,68,68,.15)',display:'flex',alignItems:'center',gap:10}}>
+          <span>⚠️ {errMsg}</span>
+          <button onClick={()=>setErrMsg('')} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'#fca5a5',fontWeight:700}}>✕</button>
+        </div>
+      )}
+      {loading&&<LoadingOverlay/>}
+      {screen==='login'&&<LoginScreen onSelect={handleSelect} loading={loading}/>}
+      {screen==='main'&&ud&&<MainScreen user={user} ud={ud} onWrite={()=>setScreen('write')} onInbox={()=>setInbox(true)} onLogout={()=>{setUser(null);setUd(null);setScreen('login');}}/>}
+      {screen==='write'&&<WriteScreen user={user} onSend={handleSend} onBack={()=>setScreen('main')} loading={loading}/>}
+      {pwModal&&<IndividualPwModal name={pwModal.name} mode={pwModal.mode} onSuccess={handlePwSuccess} onCancel={()=>setPwModal(null)}/>}
+      {inbox&&ud&&<InboxModal inbox={ud.inbox||[]} onClose={()=>setInbox(false)}/>}
+      {success&&<SuccessModal recv={success} onClose={()=>setSuccess(null)}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
